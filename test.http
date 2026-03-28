@@ -1,0 +1,33 @@
+### GET tous les ingrédients
+GET http://localhost:8080/ingredients?page=1&size=10
+
+###
+
+### GET ingrédient par id
+GET http://localhost:8080/ingredients/1
+
+###
+
+### GET stock d'un ingrédient
+GET http://localhost:8080/ingredients/1/stock?at=2024-01-06T12:00:00Z&unit=KG
+
+###
+
+### GET tous les plats
+GET http://localhost:8080/dishes
+
+###
+
+### POST commande
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "reference": "CMD001",
+  "dishOrders": [
+    {
+      "dish": { "id": 1 },
+      "quantity": 2
+    }
+  ]
+}

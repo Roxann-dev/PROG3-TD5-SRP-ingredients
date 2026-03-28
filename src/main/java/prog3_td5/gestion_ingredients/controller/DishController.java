@@ -20,9 +20,14 @@ public class DishController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Dish>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(dishRepository.findAllDishes());
+    public ResponseEntity<?> findAll() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(dishRepository.findAllDishes());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getClass().getName() + " : " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}/ingredients")

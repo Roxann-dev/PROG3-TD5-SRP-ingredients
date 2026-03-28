@@ -152,7 +152,6 @@ public class DishRepository {
 
                 DishIngredient di = new DishIngredient(
                         null,
-                        null,
                         ing,
                         rs.getDouble("quantity"),
                         UnitType.valueOf(rs.getString("unit"))
@@ -250,11 +249,12 @@ public class DishRepository {
                 d.setName(rs.getString("name"));
                 d.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
                 d.setPrice(rs.getObject("price") != null ? rs.getDouble("price") : null);
+                d.setIngredients(findDishIngredientByDishId(d.getId()));
                 dishes.add(d);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur récupération plats : " + e.getMessage());
-        } finally {
+            throw new RuntimeException("Erreur récupération plats : " + e.getMessage(), e);
+        }finally {
             dataSource.closeConnection(conn);
         }
         return dishes;

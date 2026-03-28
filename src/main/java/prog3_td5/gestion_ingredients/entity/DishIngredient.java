@@ -1,15 +1,14 @@
 package prog3_td5.gestion_ingredients.entity;
 
+
 public class DishIngredient {
     private Integer id;
-    private Dish dish;
     private Ingredient ingredient;
     private Double quantity;
     private UnitType unit;
 
-    public DishIngredient(Integer id, Dish dish, Ingredient ingredient, Double quantity, UnitType unit) {
+    public DishIngredient(Integer id, Ingredient ingredient, Double quantity, UnitType unit) {
         this.id = id;
-        this.dish = dish;
         this.ingredient = ingredient;
         this.quantity = quantity;
         this.unit = unit;
@@ -21,14 +20,6 @@ public class DishIngredient {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Dish getDish() {
-        return dish;
-    }
-
-    public void setDish(Dish dish) {
-        this.dish = dish;
     }
 
     public Ingredient getIngredient() {

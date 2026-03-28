@@ -84,7 +84,7 @@ public class Dish {
                 '}';
     }
 
-    public Double getDishCost() {
+    public Double calculateDishCost() {
         double total = 0.0;
         for (DishIngredient di : ingredients) {
             total += di.getIngredient().getPrice() * di.getQuantity();
@@ -93,11 +93,11 @@ public class Dish {
     }
 
 
-    public Double getGrossMargin() {
+    public Double calculateGrossMargin() {
         if (this.price == null) {
             throw new RuntimeException("Calcul de marge impossible : le plat '" +
                     this.name + "' n'a pas de prix de vente défini.");
         }
-        return this.price - getDishCost();
+        return this.price - calculateDishCost();
     }
 }

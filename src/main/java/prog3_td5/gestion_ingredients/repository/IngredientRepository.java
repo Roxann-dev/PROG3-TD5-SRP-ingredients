@@ -163,7 +163,7 @@ public class IngredientRepository {
 
     public Ingredient findIngredientById(int id) {
         Ingredient ingredient = null;
-        String sql = "SELECT id, name FROM ingredient WHERE id = ?";
+        String sql = "SELECT id, name, price, category FROM ingredient WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -175,7 +175,8 @@ public class IngredientRepository {
                 ingredient = new Ingredient();
                 ingredient.setId(rs.getInt("id"));
                 ingredient.setName(rs.getString("name"));
-
+                ingredient.setPrice(rs.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
                 ingredient.setStockMovementList(findMovementsByIngredientId(id));
             }
         } catch (SQLException e) {
