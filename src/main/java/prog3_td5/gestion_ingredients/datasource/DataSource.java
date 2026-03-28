@@ -1,9 +1,12 @@
 package prog3_td5.gestion_ingredients.datasource;
 
+import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Component
 public class DataSource {
 
     public Connection getConnection() {
