@@ -238,5 +238,25 @@ public class DishRepository {
         }
     }
 
-
+    public List<Dish> findAllDishes() {
+        List<Dish> dishes = new ArrayList<>();
+        String sql = "SELECT * FROM dish";
+        Connection conn = dataSource.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Dish d = new Dish();
+                d.setId(rs.getInt("id"));
+                d.setName(rs.getString("name"));
+                d.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                d.setPrice(rs.getObject("price") != null ? rs.getDouble("price") : null);
+                dishes.add(d);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur récupération plats : " + e.getMessage());
+        } finally {
+            dataSource.closeConnection(conn);
+        }
+        return dishes;
+    }
 }
