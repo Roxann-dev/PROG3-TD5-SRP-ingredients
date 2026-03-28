@@ -19,15 +19,13 @@ GET http://localhost:8080/dishes
 ###
 
 ### POST commande
-POST http://localhost:8080/orders
+PUT http://localhost:8080/dishes/1/ingredients
 Content-Type: application/json
 
-{
-  "reference": "CMD001",
-  "dishOrders": [
-    {
-      "dish": { "id": 1 },
-      "quantity": 2
-    }
-  ]
-}
+[
+  {
+    "ingredient": { "id": 1 },
+    "quantity": 0.5,
+    "unit": "KG"
+  }
+]
