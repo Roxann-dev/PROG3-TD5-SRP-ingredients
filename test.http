@@ -29,3 +29,18 @@ Content-Type: application/json
     "unit": "KG"
   }
 ]
+
+###
+
+### Ingrédient inexistant
+GET http://localhost:8080/ingredients/999
+
+###
+
+### Stock sans paramètres
+GET http://localhost:8080/ingredients/1/stock
+
+###
+
+### PUT sans body
+PUT http://localhost:8080/dishes/1/ingredients

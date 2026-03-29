@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import prog3_td5.gestion_ingredients.entity.Ingredient;
 import prog3_td5.gestion_ingredients.entity.StockValue;
+import prog3_td5.gestion_ingredients.exception.BadRequestException;
+import prog3_td5.gestion_ingredients.exception.NotFoundException;
 import prog3_td5.gestion_ingredients.repository.IngredientRepository;
+import prog3_td5.gestion_ingredients.validator.IngredientValidator;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,9 +18,11 @@ import java.util.List;
 public class IngredientController {
 
     private final IngredientRepository ingredientRepository;
+    private final IngredientValidator ingredientValidator;
 
-    public IngredientController(IngredientRepository ingredientRepository) {
+    public IngredientController(IngredientRepository ingredientRepository, IngredientValidator ingredientValidator) {
         this.ingredientRepository = ingredientRepository;
+        this.ingredientValidator = ingredientValidator;
     }
 
     @GetMapping
@@ -32,14 +37,11 @@ public class IngredientController {
     public ResponseEntity<?> findIngredientById(@PathVariable int id) {
         try {
             Ingredient ingredient = ingredientRepository.findIngredientById(id);
-            if (ingredient == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Ingredient.id=" + id + " is not found");
-            }
+            ingredientValidator.validateIngredientExists(ingredient, id);
             return ResponseEntity.status(HttpStatus.OK).body(ingredient);
-        } catch (RuntimeException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Ingredient.id=" + id + " is not found");
+                    .body(e.getMessage());
         }
     }
 
@@ -48,22 +50,19 @@ public class IngredientController {
             @PathVariable int id,
             @RequestParam(required = false) String at,
             @RequestParam(required = false) String unit) {
-        if (at == null || unit == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Either mandatory query parameter 'at' or 'unit' is not provided.");
-        }
         try {
+            ingredientValidator.validateQueryParams(at, unit);
             Ingredient ingredient = ingredientRepository.findIngredientById(id);
-            if (ingredient == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Ingredient.id=" + id + " is not found");
-            }
+            ingredientValidator.validateIngredientExists(ingredient, id);
             Instant instant = Instant.parse(at);
             StockValue stockValue = ingredient.getStockValueAt(instant);
             return ResponseEntity.status(HttpStatus.OK).body(stockValue);
-        } catch (RuntimeException e) {
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Ingredient.id=" + id + " is not found");
+                    .body(e.getMessage());
         }
     }
 }

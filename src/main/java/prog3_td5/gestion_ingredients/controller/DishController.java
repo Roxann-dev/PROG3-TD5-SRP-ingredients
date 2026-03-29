@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import prog3_td5.gestion_ingredients.entity.Dish;
 import prog3_td5.gestion_ingredients.entity.DishIngredient;
+import prog3_td5.gestion_ingredients.exception.BadRequestException;
 import prog3_td5.gestion_ingredients.repository.DishRepository;
+import prog3_td5.gestion_ingredients.validator.DishValidator;
 
 import java.util.List;
 
@@ -14,9 +16,11 @@ import java.util.List;
 public class DishController {
 
     private final DishRepository dishRepository;
+    private final DishValidator dishValidator;
 
-    public DishController(DishRepository dishRepository) {
+    public DishController(DishRepository dishRepository, DishValidator dishValidator) {
         this.dishRepository = dishRepository;
+        this.dishValidator = dishValidator;
     }
 
     @GetMapping
@@ -34,15 +38,15 @@ public class DishController {
     public ResponseEntity<?> updateIngredients(
             @PathVariable int id,
             @RequestBody(required = false) List<DishIngredient> ingredients) {
-        if (ingredients == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Request body is required");
-        }
         try {
+            dishValidator.validateIngredient(ingredients);
             Dish dish = dishRepository.findDishById(id);
             dish.setIngredients(ingredients);
             Dish updated = dishRepository.saveDish(dish);
             return ResponseEntity.status(HttpStatus.OK).body(updated);
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Dish.id=" + id + " is not found");
