@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import prog3_td5.gestion_ingredients.entity.Ingredient;
+import prog3_td5.gestion_ingredients.entity.StockMovementCreation;
 import prog3_td5.gestion_ingredients.entity.StockValue;
 import prog3_td5.gestion_ingredients.exception.BadRequestException;
 import prog3_td5.gestion_ingredients.exception.NotFoundException;
@@ -77,6 +78,23 @@ public class IngredientController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(ingredientRepository.findStockMovementsByIngredientIdBetween(id, from, to));
+        } catch (NotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/stockMovements")
+    public ResponseEntity<?> addStockMovements(
+            @PathVariable int id,
+            @RequestBody List<StockMovementCreation> movements){
+        try {
+            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            ingredientValidator.validateIngredientExists(ingredient, id);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ingredientRepository.saveStockMovementsForIngredient(id, movements));
         } catch (NotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)

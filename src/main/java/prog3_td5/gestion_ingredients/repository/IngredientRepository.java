@@ -282,4 +282,34 @@ public class IngredientRepository {
         }
         return list;
     }
+
+    public List<StockMovement> saveStockMovementsForIngredient(int ingredientId, List<StockMovementCreation> movements){
+        List<StockMovement> list = new ArrayList<>();
+        String sql = "INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)\n" +
+                "VALUES (?, ?, ?::movement_type, ?::unit_type, ?)\n" +
+                "RETURNING id, creation_datetime";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (StockMovementCreation smc : movements) {
+                ps.setInt(1, ingredientId);
+                ps.setDouble(2, smc.getQuantity());
+                ps.setString(3, smc.getType().name());
+                ps.setString(4, smc.getUnit().name());
+                ps.setTimestamp(5, Timestamp.from(Instant.now()));
+
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    StockMovement sm = new StockMovement();
+                    sm.setId(rs.getInt("id"));
+                    sm.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
+                    sm.setType(smc.getType());
+                    sm.setValue(new StockValue(smc.getQuantity(), smc.getUnit()));
+                    list.add(sm);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
 }
