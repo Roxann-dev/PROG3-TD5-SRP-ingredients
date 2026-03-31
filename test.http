@@ -44,3 +44,28 @@ GET http://localhost:8080/ingredients/1/stock
 
 ### PUT sans body
 PUT http://localhost:8080/dishes/1/ingredients
+
+###
+
+
+### GET stockMovements avec plage de dates
+GET http://localhost:8080/ingredients/1/stockMovements?from=2024-01-05T00:00:00Z&to=2024-01-06T23:59:59Z
+
+###
+
+### POST ajouter un mouvement
+POST http://localhost:8080/ingredients/1/stockMovements
+Content-Type: application/json
+
+[
+  {
+    "quantity": 2.5,
+    "unit": "KG",
+    "type": "IN"
+  }
+]
+
+###
+
+### Ingrédient inexistant
+GET http://localhost:8080/ingredients/999/stockMovements?from=2024-01-01T00:00:00Z&to=2024-01-31T00:00:00Z

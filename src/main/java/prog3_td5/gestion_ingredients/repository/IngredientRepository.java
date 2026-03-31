@@ -272,6 +272,7 @@ public class IngredientRepository {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 StockMovement sm = new StockMovement();
+                sm.setId(rs.getInt("id"));
                 sm.setType(MovementType.valueOf(rs.getString("type")));
                 sm.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
                 sm.setValue(new StockValue(rs.getDouble("quantity"), UnitType.valueOf(rs.getString("unit"))));
