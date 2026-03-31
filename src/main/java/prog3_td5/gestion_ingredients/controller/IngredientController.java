@@ -65,4 +65,22 @@ public class IngredientController {
                     .body(e.getMessage());
         }
     }
+
+    @GetMapping("/{id}/stockMovements")
+    public ResponseEntity<?> getStockMovements(
+            @PathVariable int id,
+            @RequestParam Instant from,
+            @RequestParam Instant to){
+        try {
+            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            ingredientValidator.validateIngredientExists(ingredient, id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ingredientRepository.findStockMovementsByIngredientIdBetween(id, from, to));
+        } catch (NotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
 }

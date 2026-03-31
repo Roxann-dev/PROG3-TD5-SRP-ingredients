@@ -5,6 +5,7 @@ import prog3_td5.gestion_ingredients.datasource.DataSource;
 import prog3_td5.gestion_ingredients.entity.*;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -255,5 +256,30 @@ public class IngredientRepository {
             rs.next();
             return rs.getInt(1);
         }
+    }
+    
+    public List<StockMovement> findStockMovementsByIngredientIdBetween(int id, Instant from, Instant to){
+        List<StockMovement> list = new ArrayList<>();
+        String sql = "SELECT id, creation_datetime, unit, type, quantity FROM stock_movement WHERE id_ingredient = ? \n" +
+                "AND creation_datetime >= ? \n" +
+                "AND creation_datetime <= ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setTimestamp(2, Timestamp.from(from));
+            ps.setTimestamp(3, Timestamp.from(to));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                StockMovement sm = new StockMovement();
+                sm.setType(MovementType.valueOf(rs.getString("type")));
+                sm.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
+                sm.setValue(new StockValue(rs.getDouble("quantity"), UnitType.valueOf(rs.getString("unit"))));
+                list.add(sm);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
     }
 }
