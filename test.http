@@ -18,7 +18,7 @@ GET http://localhost:8080/dishes
 
 ###
 
-### POST commande
+### PUT commande
 PUT http://localhost:8080/dishes/1/ingredients
 Content-Type: application/json
 

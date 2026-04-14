@@ -120,16 +120,47 @@ paths:
               schema:
                 type: string
 
-
-
-
-
-
-
-
-
-
-
+  /dishes/{id}/ingredients:
+    put:
+      summary: Associer ou dissocier des ingrédients à un plat
+      tags:
+        - Dishes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '400':
+          description: Corps de requête manquant
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Ingredient list is null, request body is required"
+        '404':
+          description: Plat inexistant
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Dish.id=1 is not found"
 
 components:
   schemas:
