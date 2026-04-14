@@ -8,22 +8,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import prog3_td5.gestion_ingredients.entity.Order;
 import prog3_td5.gestion_ingredients.repository.OrderRepository;
+import prog3_td5.gestion_ingredients.service.OrderService;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping
     public ResponseEntity<?> saveOrder(@RequestBody Order order) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(orderRepository.saveOrder(order));
+                    .body(orderService.saveOrder(order));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());

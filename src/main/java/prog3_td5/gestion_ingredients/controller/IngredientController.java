@@ -9,39 +9,47 @@ import prog3_td5.gestion_ingredients.entity.StockValue;
 import prog3_td5.gestion_ingredients.exception.BadRequestException;
 import prog3_td5.gestion_ingredients.exception.NotFoundException;
 import prog3_td5.gestion_ingredients.repository.IngredientRepository;
+import prog3_td5.gestion_ingredients.service.IngredientService;
 import prog3_td5.gestion_ingredients.validator.IngredientValidator;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ingredients")
 public class IngredientController {
 
-    private final IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
     private final IngredientValidator ingredientValidator;
 
-    public IngredientController(IngredientRepository ingredientRepository, IngredientValidator ingredientValidator) {
-        this.ingredientRepository = ingredientRepository;
+    public IngredientController(IngredientService ingredientService, IngredientValidator ingredientValidator) {
+        this.ingredientService = ingredientService;
         this.ingredientValidator = ingredientValidator;
     }
 
     @GetMapping
-    public ResponseEntity<List<Ingredient>> findIngredients(
-            @RequestParam int page,
-            @RequestParam int size) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ingredientRepository.findIngredients(page, size));
+    public ResponseEntity<?> findAllIngredients() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(ingredientService.findListIngredients());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findIngredientById(@PathVariable int id) {
         try {
-            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            Ingredient ingredient = ingredientService.findIngredientById(id);
             ingredientValidator.validateIngredientExists(ingredient, id);
             return ResponseEntity.status(HttpStatus.OK).body(ingredient);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
     }
@@ -53,7 +61,7 @@ public class IngredientController {
             @RequestParam(required = false) String unit) {
         try {
             ingredientValidator.validateQueryParams(at, unit);
-            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            Ingredient ingredient = ingredientService.findIngredientById(id);
             ingredientValidator.validateIngredientExists(ingredient, id);
             Instant instant = Instant.parse(at);
             StockValue stockValue = ingredient.getStockValueAt(instant);
@@ -73,14 +81,18 @@ public class IngredientController {
             @RequestParam Instant from,
             @RequestParam Instant to){
         try {
-            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            Ingredient ingredient = ingredientService.findIngredientById(id);
             ingredientValidator.validateIngredientExists(ingredient, id);
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(ingredientRepository.findStockMovementsByIngredientIdBetween(id, from, to));
+                    .body(ingredientService.getStockMovements(id, from, to));
         } catch (NotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }
@@ -90,11 +102,11 @@ public class IngredientController {
             @PathVariable int id,
             @RequestBody List<StockMovementCreation> movements){
         try {
-            Ingredient ingredient = ingredientRepository.findIngredientById(id);
+            Ingredient ingredient = ingredientService.findIngredientById(id);
             ingredientValidator.validateIngredientExists(ingredient, id);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(ingredientRepository.saveStockMovementsForIngredient(id, movements));
+                    .body(ingredientService.addStockMovements(id, movements));
         } catch (NotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)

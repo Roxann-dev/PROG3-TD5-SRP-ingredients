@@ -7,6 +7,7 @@ import prog3_td5.gestion_ingredients.entity.Dish;
 import prog3_td5.gestion_ingredients.entity.DishIngredient;
 import prog3_td5.gestion_ingredients.exception.BadRequestException;
 import prog3_td5.gestion_ingredients.repository.DishRepository;
+import prog3_td5.gestion_ingredients.service.DishService;
 import prog3_td5.gestion_ingredients.validator.DishValidator;
 
 import java.util.List;
@@ -15,11 +16,11 @@ import java.util.List;
 @RequestMapping("/dishes")
 public class DishController {
 
-    private final DishRepository dishRepository;
+    private final DishService dishService;
     private final DishValidator dishValidator;
 
-    public DishController(DishRepository dishRepository, DishValidator dishValidator) {
-        this.dishRepository = dishRepository;
+    public DishController(DishService dishService, DishValidator dishValidator) {
+        this.dishService = dishService;
         this.dishValidator = dishValidator;
     }
 
@@ -27,7 +28,7 @@ public class DishController {
     public ResponseEntity<?> findAll() {
         try {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(dishRepository.findAllDishes());
+                    .body(dishService.findAllDishes());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getClass().getName() + " : " + e.getMessage());
@@ -40,9 +41,7 @@ public class DishController {
             @RequestBody(required = false) List<DishIngredient> ingredients) {
         try {
             dishValidator.validateIngredient(ingredients);
-            Dish dish = dishRepository.findDishById(id);
-            dish.setIngredients(ingredients);
-            Dish updated = dishRepository.saveDish(dish);
+            Dish updated = dishService.updateIngredients(id, ingredients);
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -37,6 +37,23 @@ public class IngredientRepository {
         return ingredients;
     }
 
+    public List<Ingredient> findListIngredients() {
+        List<Ingredient> ingredients = new ArrayList<>();
+        String sql = "SELECT * FROM ingredient";
+        Connection conn = dataSource.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ingredients.add(mapResultSetToIngredient(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur pagination : " + e.getMessage());
+        } finally {
+            dataSource.closeConnection(conn);
+        }
+        return ingredients;
+    }
+
     public List<Ingredient> findIngredientsByCriteria(String name, CategoryEnum cat, String dishName, int page, int size) {
         List<Ingredient> ingredients = new ArrayList<>();
         // Remplace la ligne 126 par :
