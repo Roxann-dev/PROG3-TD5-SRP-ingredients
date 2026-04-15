@@ -110,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
                 items:
                   $ref: '#/components/schemas/Dish'
         '500':
@@ -211,7 +211,7 @@ components:
           type: number
           format: double
         ingredients:
-          type: object
+          type: array
           items:
             $ref: '#/components/schemas/Ingredient'
 
